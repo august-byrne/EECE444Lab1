@@ -10,6 +10,8 @@
 * 12/06/2018 Todd Morton
 * Version 2021.1 First working version for MCUX11.2
 * 01/04/2020 Todd Morton
+* Version 2021.2 Edited version for EECE444 Lab 1
+* 01/15/2021 August Byrne
 *****************************************************************************************/
 #include "app_cfg.h"
 #include "os.h"
@@ -49,8 +51,6 @@ void main(void) {
     CPU_IntDis();               /* Disable all interrupts, OS will enable them  */
 
     OSInit(&os_err);                    /* Initialize uC/OS-III                         */
-    while(os_err != OS_ERR_NONE){                   /* Error Trap                       */
-    }
 
     OSTaskCreate(&AppTaskStartTCB,                  /* Address of TCB assigned to task */
                  "Start Task",                      /* Name you want to give the task */
@@ -66,12 +66,7 @@ void main(void) {
                  (OS_OPT_TASK_NONE), /* Options */
                  &os_err);                          /* Ptr to error code destination */
 
-    while(os_err != OS_ERR_NONE){                   /* Error Trap                       */
-    }
-
     OSStart(&os_err);               /*Start multitasking(i.e. give control to uC/OS)    */
-    while(os_err != OS_ERR_NONE){                   /* Error Trap                       */
-    }
 }
 
 /*****************************************************************************************
@@ -109,8 +104,6 @@ static void AppStartTask(void *p_arg) {
                 (void *) 0,
                 (OS_OPT_TASK_NONE),
                 &os_err);
-    while(os_err != OS_ERR_NONE){               /* Error Trap                       */
-    }
 
     OSTaskCreate(&AppTask2TCB,    /* Create Task 2                    */
                 "App Task2 ",
@@ -125,12 +118,8 @@ static void AppStartTask(void *p_arg) {
                 (void *) 0,
                 (OS_OPT_TASK_NONE),
                 &os_err);
-    while(os_err != OS_ERR_NONE){               /* Error Trap                       */
-    }
 
     OSTaskDel((OS_TCB *)0, &os_err);
-    while(os_err != OS_ERR_NONE){                   /* Error Trap                   */
-    }
 }
 
 /*****************************************************************************************
@@ -148,15 +137,11 @@ static void AppTask1(void *p_arg){
     
         DB1_TURN_OFF();                             /* Turn off debug bit while waiting */
     	OSTimeDly(100,OS_OPT_TIME_PERIODIC,&os_err);     /* Task period = 100ms   */
-        while(os_err != OS_ERR_NONE){                   /* Error Trap                   */
-        }
         DB1_TURN_ON();                          /* Turn on debug bit while ready/running*/
         LED8_TOGGLE();                          /* Toggle green LED                     */
         timcntr++;
         if(timcntr == 10){                     /* Signal Task2 every second             */
             (void)OSTaskSemPost(&AppTask2TCB,OS_OPT_POST_NONE,&os_err);
-            while(os_err != OS_ERR_NONE){           /* Error Trap                       */
-            }
             timcntr = 0;
         }else{
         }
@@ -180,8 +165,6 @@ static void AppTask2(void *p_arg){
                       OS_OPT_PEND_BLOCKING,     /* Block until posted                   */
                       (void *)0,                /* No timestamp                         */
                       &os_err);
-        while(os_err != OS_ERR_NONE){           /* Error Trap                           */
-        }
         DB2_TURN_ON();                          /* Turn on debug bit while ready/running*/
         LED9_TOGGLE();;                         /* Toggle blue LED                    */
     }
